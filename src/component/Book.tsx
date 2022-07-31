@@ -135,7 +135,7 @@ function Book(props: BookPropType) {
                 <Info className={'author'}>{props.book.author}</Info>
             </InfoWrap>
             <InfoWrap className={'price'}>
-                <Info className={'price'}>{props.book.discount?.toLocaleString()}원</Info>
+                <Info className={'price'}>{Number(props.book.discount)?.toLocaleString()}원</Info>
             </InfoWrap>
             <InfoWrap className={'button-row'}>
                 <Button onClick={onPurchase}><span>구매하기</span></Button>
@@ -164,9 +164,9 @@ function Book(props: BookPropType) {
                 <Info className={'detail'}>
                     <Button className={'fill'} onClick={onPurchase}><span>구매하기</span></Button>
                     {props.book.discount ? <DetailInfo>할인가 <span
-                        className={'discount'}>{props.book.discount.toLocaleString()}원</span></DetailInfo> : null}
+                        className={'discount'}>{Number(props.book.discount).toLocaleString()}원</span></DetailInfo> : null}
                     {props.book.price ? <DetailInfo>정가 <span
-                        className={'price'}>{props.book.price.toLocaleString()}원</span></DetailInfo> : null}
+                        className={'price'}>{Number(props.book.price).toLocaleString()}원</span></DetailInfo> : null}
                 </Info>
             </InfoWrap>
         </DetailRow> : null}
