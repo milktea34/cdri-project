@@ -1,12 +1,12 @@
-import React, {useCallback, useReducer} from 'react';
+import React, {useCallback, useReducer, useState} from 'react';
 import './App.css';
 import styled from 'styled-components';
-import SearchBar from "./component/SearchBar";
 import SearchResult from "./component/SearchResult";
 import {BookProps, DetailQuery} from "./interfaces";
 import QueryReducer, {initialQueryState} from "./reducer/QueryReducer";
 import {getBookList, getBookListDetail} from "./api/BookAPI";
 import BookReducer from "./reducer/BookReducer";
+import SearchBar from "./component/SearchBar";
 
 const Title = styled.h3`
       text-align: left;
@@ -47,6 +47,16 @@ function App() {
     };
     const [state, dispatch] = useReducer(QueryReducer, initState);
     const [bookState, bookDispatch] = useReducer(BookReducer, initBookState);
+    const [isDetailPopupShow, setIsDetailPopupShow] = useState(false);
+
+    const showDetailPopup = () => {
+        setIsDetailPopupShow(true)
+        bookDispatch({type: 'TOGGLE_SEARCH_MODE', value: {isDetailSearch: true}});
+    }
+    const closeDetailPopup = () => {
+        setIsDetailPopupShow(false)
+        bookDispatch({type: 'TOGGLE_SEARCH_MODE', value: {isDetailSearch: false}});
+    }
 
     const onChangeSelect = useCallback((event: any, query: DetailQuery, index: number) => {
         query.key = event.target.value;
@@ -68,11 +78,6 @@ function App() {
     const onResetQuery = useCallback(() => {
         dispatch({type: 'RESET_QUERY'});
     }, []);
-
-    const toggleDetailSearch = useCallback(() => {
-        bookDispatch({type: 'TOGGLE_SEARCH_MODE', value: {isDetailSearch: !bookState.isDetailSearch}});
-    }, [bookState.isDetailSearch]);
-
 
     const onSearchKeywordEntered = useCallback((event: any) => {
         if (event.key === 'Enter') {
@@ -109,6 +114,7 @@ function App() {
     const onSubmitDetailSearch = useCallback(() => {
         const queryParam = getQueryStringFromQuery();
         if (queryParam.length > 0) {
+            closeDetailPopup();
             getBookListDetail(queryParam.join('&'), 1).then((res) => {
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",
@@ -128,6 +134,7 @@ function App() {
         bookDispatch({type: "UPDATE_CURSOR", value: {cursor: cursor}})
         if (bookState.keyword && !bookState.isDetailSearch) {
             getBookList(bookState.keyword, cursor).then((res) => {
+                window.scrollTo({top: 0})
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",
                     value: {
@@ -141,6 +148,7 @@ function App() {
             const queryParam = getQueryStringFromQuery();
             if (queryParam.length > 0) {
                 getBookListDetail(queryParam.join('&'), cursor).then((res) => {
+                    window.scrollTo({top: 0})
                     bookDispatch({
                         type: "FETCH_BOOK_LIST",
                         value: {
@@ -167,7 +175,9 @@ function App() {
             <SearchBar queryList={state.queryList}
                        keyword={state.keyword}
                        isDetailSearch={bookState.isDetailSearch}
-                       toggleDetailSearch={toggleDetailSearch}
+                       isDetailPopupShow={isDetailPopupShow}
+                       closeDetailPopup={closeDetailPopup}
+                       showDetailPopup={showDetailPopup}
                        onChangeSelect={onChangeSelect}
                        onResetQuery={onResetQuery}
                        onChangeTextInput={onChangeTextInput}

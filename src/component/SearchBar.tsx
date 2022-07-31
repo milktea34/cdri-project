@@ -143,10 +143,12 @@ interface DetailQueryProps {
     onAddQuery: MouseEventHandler;
     onRemoveQuery: Function;
     onResetQuery: MouseEventHandler;
-    toggleDetailSearch: MouseEventHandler;
     onSubmitDetailSearch: MouseEventHandler;
     onSearchKeywordEntered: KeyboardEventHandler;
     onSearchKeywordUpdated: ChangeEventHandler;
+    closeDetailPopup: MouseEventHandler;
+    showDetailPopup: MouseEventHandler;
+    isDetailPopupShow: Boolean;
 }
 
 function QueryForm(props: any) {
@@ -166,7 +168,7 @@ function QueryForm(props: any) {
 
 function DetailSearchPopup(props: DetailQueryProps) {
     return <Modal>
-        <Row className={'close-button-row'}><BiX size={"1.5rem"} onClick={props.toggleDetailSearch}></BiX></Row>
+        <Row className={'close-button-row'}><BiX size={"1.5rem"} onClick={props.closeDetailPopup}></BiX></Row>
         {props.queryList.map((query, index) => <Row key={index}>
             <QueryForm index={index} query={query}
                        onChangeTextInput={props.onChangeTextInput}
@@ -191,17 +193,19 @@ function SearchBar(props: DetailQueryProps) {
             <BiSearch size={20} color={'#353C49'}></BiSearch>
             <SearchInput value={props.keyword} placeholder={"검색어를 입력하세요."} onChange={props.onSearchKeywordUpdated} onKeyDown={props.onSearchKeywordEntered}></SearchInput>
         </SearchBarWrapper>
-        <DetailSearchButton onClick={props.toggleDetailSearch}>상세검색</DetailSearchButton>
-        {props.isDetailSearch ? <DetailSearchPopup queryList={props.queryList}
+        <DetailSearchButton onClick={props.showDetailPopup}>상세검색</DetailSearchButton>
+        {props.isDetailPopupShow ? <DetailSearchPopup queryList={props.queryList}
                                                    keyword={props.keyword}
                                                    isDetailSearch={props.isDetailSearch}
-                                                   toggleDetailSearch={props.toggleDetailSearch}
                                                    onChangeSelect={props.onChangeSelect}
                                                    onResetQuery={props.onResetQuery}
                                                    onChangeTextInput={props.onChangeTextInput}
                                                    onRemoveQuery={props.onRemoveQuery}
                                                    onSubmitDetailSearch={props.onSubmitDetailSearch}
                                                    onAddQuery={props.onAddQuery}
+                                                   isDetailPopupShow={props.isDetailPopupShow}
+                                                   closeDetailPopup={props.closeDetailPopup}
+                                                   showDetailPopup={props.showDetailPopup}
                                                    onSearchKeywordUpdated={props.onSearchKeywordUpdated}
                                                    onSearchKeywordEntered={props.onSearchKeywordEntered}></DetailSearchPopup> : null}
     </Wrapper>;
