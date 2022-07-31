@@ -35,7 +35,6 @@ const SearchTitle = styled(Title)`
 
 
 function App() {
-
     const initState = {
         queryList: [initialQueryState()]
     };
@@ -77,36 +76,47 @@ function App() {
 
     const onSearchKeywordEntered = useCallback((event: any) => {
         if (event.key === 'Enter') {
-            console.log(event.target.value);
             bookState.keyword = event.target.value;
+            dispatch({type: 'RESET_QUERY'}); // 상세검색 중지
+            bookDispatch({type: 'TOGGLE_SEARCH_MODE', value: {isDetailSearch: false}});
             getBookList(bookState.keyword, 1).then((res) => {
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",
-                    value: {totalCount: res.total, bookList: [...res.items.map((book: BookProps) => book)]}
+                    value: {
+                        totalCount: res.total,
+                        bookList: [...res.items.map((book: BookProps) => book)],
+                        keyword: bookState.keyword
+                    }
                 });
             });
         }
     }, [bookState]);
 
+    const onSearchKeywordUpdated = useCallback((event: any) => {
+        bookDispatch({type: "UPDATE_KEYWORD", value: {keyword: event.target.value}});
+    }, [])
+
     const getQueryStringFromQuery = useCallback(() => {
-        const queryParam = state.queryList.map((query: DetailQuery) => {
+        return state.queryList.map((query: DetailQuery) => {
             if (query.value) {
                 return [query.key, query.value].join('=')
             } else {
                 return null;
             }
         }).filter((value: string) => value);
-        return queryParam;
-    },[state.queryList]);
+    }, [state.queryList]);
 
     const onSubmitDetailSearch = useCallback(() => {
         const queryParam = getQueryStringFromQuery();
-        console.log(queryParam);
         if (queryParam.length > 0) {
             getBookListDetail(queryParam.join('&'), 1).then((res) => {
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",
-                    value: {totalCount: res.total, bookList: [...res.items.map((book: BookProps) => book)]}
+                    value: {
+                        totalCount: res.total,
+                        bookList: [...res.items.map((book: BookProps) => book)],
+                        keyword: ''
+                    }
                 });
             });
         }
@@ -120,18 +130,24 @@ function App() {
             getBookList(bookState.keyword, cursor).then((res) => {
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",
-                    value: {totalCount: res.total, bookList: [...res.items.map((book: BookProps) => book)]}
+                    value: {
+                        totalCount: res.total,
+                        bookList: [...res.items.map((book: BookProps) => book)],
+                        keyword: bookState.keyword
+                    }
                 });
             });
-        }
-
-        if (bookState.isDetailSearch) {
+        } else {
             const queryParam = getQueryStringFromQuery();
             if (queryParam.length > 0) {
                 getBookListDetail(queryParam.join('&'), cursor).then((res) => {
                     bookDispatch({
                         type: "FETCH_BOOK_LIST",
-                        value: {totalCount: res.total, bookList: [...res.items.map((book: BookProps) => book)]}
+                        value: {
+                            totalCount: res.total,
+                            bookList: [...res.items.map((book: BookProps) => book)],
+                            keyword: ''
+                        }
                     });
                 });
             }
@@ -149,6 +165,7 @@ function App() {
                 도서 검색
             </SearchTitle>
             <SearchBar queryList={state.queryList}
+                       keyword={state.keyword}
                        isDetailSearch={bookState.isDetailSearch}
                        toggleDetailSearch={toggleDetailSearch}
                        onChangeSelect={onChangeSelect}
@@ -157,6 +174,7 @@ function App() {
                        onRemoveQuery={onRemoveQuery}
                        onSubmitDetailSearch={onSubmitDetailSearch}
                        onAddQuery={onAddQuery}
+                       onSearchKeywordUpdated={onSearchKeywordUpdated}
                        onSearchKeywordEntered={onSearchKeywordEntered}></SearchBar>
             <SearchResult list={bookState.bookList} totalCount={bookState.totalCount} cursor={bookState.cursor}
                           onUpdatePageNumber={onUpdatePageNumber}></SearchResult>

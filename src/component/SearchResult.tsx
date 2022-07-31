@@ -28,7 +28,7 @@ const BookList = styled.section`
     min-height: 50vh;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     
 `;
 
