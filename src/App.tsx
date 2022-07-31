@@ -114,7 +114,9 @@ function App() {
     const onSubmitDetailSearch = useCallback(() => {
         const queryParam = getQueryStringFromQuery();
         if (queryParam.length > 0) {
-            closeDetailPopup();
+            closeDetailPopup()
+            bookDispatch({type: 'UPDATE_KEYWORD', value: {keyword: ''}});
+            bookDispatch({type: 'TOGGLE_SEARCH_MODE', value: {isDetailSearch: true}});
             getBookListDetail(queryParam.join('&'), 1).then((res) => {
                 bookDispatch({
                     type: "FETCH_BOOK_LIST",

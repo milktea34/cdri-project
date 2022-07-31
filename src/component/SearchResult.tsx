@@ -74,7 +74,7 @@ function SearchResultList(props: BookListProps) {
         <EmptyBookIcon/>
         <EmptyLabel>검색된 결과가 없습니다.</EmptyLabel>
     </BookList> : <BookList>
-        {props.list.map((book, index) => <Book key={index} book={book}></Book>)}
+        {props.list.map((book) => <Book key={book.isbn} book={book}></Book>)}
     </BookList>;
 }
 
